@@ -1,24 +1,16 @@
-82nd Sports Pub Liquor Inventory — PWA Ready Package
+82nd Sports Pub Liquor Inventory PWA — Version 2
 
-FILES:
-- index.html
-- manifest.json
-- service-worker.js
-- icons/
+This version fixes the confusing labels:
+- Size = bottle liquid volume, for example 750ml, 1.14L, or 50 fl oz.
+- Full Scale Oz = actual full bottle weight from your scale.
+- Empty Scale Oz = actual empty bottle weight from your scale.
 
-ANDROID INSTALL:
-1. Upload all files in this folder to a HTTPS web host.
-   Easiest: Netlify Drop, GitHub Pages, or Cloudflare Pages.
-2. Open the website link in Chrome on Android.
-3. Tap the 3-dot menu.
-4. Tap "Install app" or "Add to Home screen".
-5. Name it "Liquor Count".
-6. Open it from your phone/tablet home screen.
+To update GitHub:
+1. Go to your Liquor-count-app repository.
+2. Click Add file > Upload files.
+3. Upload/replace index.html, manifest.json, service-worker.js, and the icons folder.
+4. Click Commit changes.
+5. Wait 1-3 minutes.
+6. Refresh the GitHub Pages app link.
 
-DEFAULT MANAGER PIN:
-1982
-
-IMPORTANT:
-- This version stores shift history on the device/browser using local storage.
-- For manager remote viewing, the next upgrade is Google Sheets sync or Firebase/Supabase.
-- Export CSV regularly as backup.
+Default Manager PIN: 1982

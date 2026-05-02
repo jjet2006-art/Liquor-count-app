@@ -706,8 +706,8 @@
 
   <div class="col-header">
     <span>Item</span>
-    <span>Full Wt</span>
-    <span>Empty Wt</span>
+    <span>Full Scale Oz</span>
+    <span>Empty Scale Oz</span>
     <span>Start</span>
     <span>End</span>
     <span>Used / Left</span>
@@ -805,9 +805,9 @@
   </div>
 
   <div class="settings-section">
-    <h2>Bottle Weight Master List</h2>
+    <h2>Bottle Size & Scale Weight Master List</h2>
     <div class="help-box">
-      The starting weights below include the values already shown on your original PDF where available. For bottles without a verified empty weight, the app uses a practical estimate so you can start using it immediately. For best accuracy, weigh one empty bottle of each brand with the cap and update this table.
+      <strong>Important:</strong> The <strong>Size</strong> column is the bottle’s liquid volume, like 750ml, 1.14L, or 50 fl oz. The <strong>Full Scale Oz</strong> and <strong>Empty Scale Oz</strong> columns are the actual weights from your scale. So it is normal to see 750ml under Size and 43 under Full Scale Oz. For best accuracy, weigh one full bottle and one empty bottle with cap, then update those two weight columns.
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
       <button class="btn secondary small" onclick="downloadWeightTemplate()">Export Weight Template CSV</button>
@@ -821,8 +821,8 @@
             <th>Item</th>
             <th>Method</th>
             <th>Size</th>
-            <th>Full Wt / Par</th>
-            <th>Empty Wt</th>
+            <th>Full Scale Oz / Par</th>
+            <th>Empty Scale Oz</th>
             <th>Verified?</th>
           </tr>
         </thead>
@@ -1539,7 +1539,7 @@ function csvEscape(v) {
 
 function buildCSVForEntry(entry) {
   let csv = `82nd Sports Pub Liquor Count\nDate:,${entry.date}\nStaff:,${entry.staff}\nShift:,${entry.shift}\nSaved:,${new Date(entry.saved).toLocaleString()}\n\n`;
-  csv += 'Category,Item,Method,Size,Full Weight/Par,Empty Weight,Start,End,Used,Remaining %,Notes\n';
+  csv += 'Category,Item,Method,Size,Full Scale Oz/Par,Empty Scale Oz,Start,End,Used,Remaining %,Notes\n';
   ITEMS.forEach(item => {
     const key = itemKey(item);
     const c = entry.counts[key] || { start:'', end:'', notes:'' };
@@ -1593,7 +1593,7 @@ function exportAllCSV() {
 
 function downloadWeightTemplate() {
   const s = getSettings();
-  let csv = 'Category,Item,Method,Size,Full Weight/Par,Empty Weight,Verified\n';
+  let csv = 'Category,Item,Method,Size,Full Scale Oz/Par,Empty Scale Oz,Verified\n';
   ITEMS.forEach(item => {
     const key = itemKey(item);
     const wr = s.weights[key] || getWeightRecord(key);
