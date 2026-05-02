@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>82nd Sports Pub — Liquor Inventory</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --card: #1a1a1f;
+    --border: #2a2a32;
+    --accent: #e8a020;
+    --text: #e8e8ec;
+    --muted: #8a8a99;
+    --green: #27ae60;
+    --red: #e74c3c;
+    --yellow: #f39c12;
+    --orange: #e67e22;
+    --blue: #3498db;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 92px;
+  }
+
+  header {
+    background: linear-gradient(135deg, #0d0d0f 0%, #1a1208 50%, #0d0d0f 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  .header-left p {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .shift-info {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  input, select, textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    outline: none;
+  }
+
+  .shift-info input, .shift-info select {
+    padding: 6px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+  .btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 8px 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .btn:hover { opacity: 0.86; }
+  .btn:active { transform: translateY(1px); }
+  .btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn.danger { background: var(--red); color: #fff; }
+  .btn.warn { background: var(--orange); color: #fff; }
+  .btn.small { padding: 5px 9px; font-size: 12px; }
+
+  .tabs {
+    display: flex;
+    padding: 0 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    position: sticky;
+    top: 76px;
+    z-index: 90;
+  }
+
+  .tab {
+    padding: 11px 18px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab .lock-icon { font-size: 11px; opacity: 0.65; }
+
+  .section { display: none; padding: 16px 20px; }
+  .section.active { display: block; }
+
+  .help-box {
+    background: rgba(232,160,32,0.08);
+    border: 1px solid rgba(232,160,32,0.24);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .help-box strong { color: var(--accent); }
+  .help-box code { font-family:'DM Mono',monospace; color:#fff; }
+
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+
+  .filter-bar input, .filter-bar select {
+    padding: 8px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+
+  .col-header {
+    display: grid;
+    grid-template-columns: minmax(170px,1.5fr) 78px 78px 78px 78px 88px 64px;
+    gap: 6px;
+    padding: 6px 0 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+    position: sticky;
+    top: 124px;
+    background: var(--bg);
+    z-index: 50;
+  }
+
+  .col-header span {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    text-align: center;
+  }
+  .col-header span:first-child { text-align: left; padding-left: 4px; }
+
+  .category-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    padding: 15px 0 6px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+  }
+
+  .item-row {
+    display: grid;
+    grid-template-columns: minmax(170px,1.5fr) 78px 78px 78px 78px 88px 64px;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.035);
+    transition: background 0.1s;
+  }
+  .item-row:hover { background: rgba(255,255,255,0.025); border-radius: 4px; }
+  .item-row.low-alert { background: rgba(231,76,60,0.06); border-left: 3px solid var(--red); padding-left: 6px; border-radius: 3px; }
+  .item-row.warn-alert { background: rgba(230,126,34,0.06); border-left: 3px solid var(--orange); padding-left: 6px; border-radius: 3px; }
+  .item-row.hidden { display:none; }
+
+  .item-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .item-name-main { white-space: normal; overflow-wrap: anywhere; }
+  .size-tag, .method-tag {
+    font-size: 9px;
+    color: var(--muted);
+    display: inline-block;
+    margin-top: 2px;
+  }
+  .method-tag { color: var(--blue); margin-left: 5px; }
+
+  .low-badge {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .low-badge.critical { background: rgba(231,76,60,0.2); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
+  .low-badge.warning { background: rgba(230,126,34,0.2); color: var(--orange); border: 1px solid rgba(230,126,34,0.3); }
+
+  .count-input {
+    padding: 6px 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    width: 100%;
+    text-align: center;
+  }
+  .count-input.filled { border-color: #2a4a2a; background: #0f1f0f; }
+  .readonly-pill {
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:6px 4px;
+    text-align:center;
+    min-height:29px;
+  }
+
+  .used-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .used-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    text-align: center;
+    font-weight: 600;
+    padding: 5px 4px;
+    border-radius: 4px;
+    width: 100%;
+    min-height: 28px;
+  }
+  .used-val.positive { color: var(--green); }
+  .used-val.negative { color: var(--red); }
+  .used-val.zero { color: var(--muted); }
+
+  .pct-bar-outer {
+    width: 100%;
+    background: var(--border);
+    border-radius: 2px;
+    height: 3px;
+    overflow: hidden;
+  }
+  .pct-bar-inner { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+  .notes-input {
+    padding: 5px 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    width: 100%;
+  }
+
+  .alert-banner {
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    display: none;
+  }
+  .alert-banner.show { display: flex; align-items: center; gap: 10px; }
+  .alert-banner.negative { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); color: var(--red); }
+  .alert-banner.low { background: rgba(230,126,34,0.1); border: 1px solid rgba(230,126,34,0.3); color: var(--orange); }
+
+  .stat-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .stat .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat .num.red { color: var(--red); }
+  .stat .num.orange { color: var(--orange); }
+  .stat .num.green { color: var(--green); }
+  .stat .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 3px;
+  }
+
+  .progress-outer { background: var(--border); border-radius: 2px; height: 3px; margin-top: 6px; overflow: hidden; }
+  .progress-inner { height: 100%; background: var(--accent); transition: width 0.3s; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .summary-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 11px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    gap: 6px;
+  }
+  .summary-row .name { color: var(--text); font-family: 'DM Mono', monospace; flex: 1; }
+  .summary-row .val { font-family: 'DM Mono', monospace; font-weight: 600; flex-shrink: 0; }
+  .summary-row .val.pos { color: var(--green); }
+  .summary-row .val.neg { color: var(--red); }
+  .summary-row .val.none { color: var(--muted); }
+  .summary-row .val.warn { color: var(--orange); }
+
+  .low-indicator {
+    font-size: 9px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+  .low-indicator.crit { background: rgba(231,76,60,0.15); color: var(--red); }
+  .low-indicator.warn { background: rgba(230,126,34,0.15); color: var(--orange); }
+
+  .history-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .history-entry {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    gap: 10px;
+  }
+  .history-entry:hover { border-color: var(--accent); }
+  .history-entry .meta { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .history-entry .title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1px; color: var(--text); }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+
+  .settings-section { margin-bottom: 28px; }
+  .settings-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    gap: 12px;
+  }
+  .setting-row label { font-size: 13px; color: var(--text); flex: 1; }
+  .setting-row .sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .setting-input {
+    padding: 7px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    width: 100px;
+    text-align: center;
+  }
+
+  .par-table { width: 100%; border-collapse: collapse; min-width: 740px; }
+  .par-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .par-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+  .par-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .par-input {
+    padding: 4px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    width: 80px;
+    text-align: center;
+  }
+
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:8px; background:var(--card); }
+
+  .pin-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.86);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    backdrop-filter: blur(4px);
+  }
+  .pin-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 28px;
+    width: 300px;
+    text-align: center;
+  }
+  .pin-box h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .pin-box p {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .pin-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    transition: transform 0.08s;
+  }
+  .pin-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    transition: all 0.15s;
+  }
+  .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+  .pin-keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .pin-key {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+    padding: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.1s;
+    user-select: none;
+  }
+  .pin-key:hover { background: var(--border); border-color: var(--accent); }
+  .pin-key:active { transform: scale(0.94); }
+  .pin-key.clear { font-size: 14px; color: var(--muted); }
+  .pin-key.zero { grid-column: 2; }
+  .pin-error {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--red);
+    height: 16px;
+    margin-top: 4px;
+  }
+
+  .export-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    z-index: 98;
+    flex-wrap: wrap;
+  }
+  .export-bar span { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); flex: 1; min-width:220px; }
+
+  @media print {
+    body { background:#fff; color:#000; padding-bottom:0; }
+    header, .tabs, .export-bar, .filter-bar, .help-box, .alert-banner, .pin-overlay { display:none !important; }
+    .section { display:none !important; padding:0; }
+    #tab-summary.section.active, #tab-count.section.active { display:block !important; }
+    .summary-card, .stat, .item-row, .col-header { border-color:#000; background:#fff; color:#000; }
+    .item-row, .col-header { grid-template-columns: 1.4fr 0.75fr 0.75fr 0.75fr 0.75fr 0.8fr 0.55fr; }
+    .count-input, .notes-input, .readonly-pill { border:1px solid #000; color:#000; background:#fff; }
+    .category-label, .header-left h1, .summary-card h3 { color:#000; }
+  }
+
+  @media (max-width: 760px) {
+    header { position: static; }
+    .tabs { top:0; }
+    .col-header { display:none; }
+    .item-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:10px;
+      margin:8px 0;
+    }
+    .item-name { grid-column: 1 / -1; font-size:13px; }
+    .used-cell { grid-column: 1 / -1; }
+    .notes-input { grid-column: 1 / -1; }
+    .readonly-pill::before, .count-input::before { content:""; }
+    .stat-bar { grid-template-columns: repeat(2,1fr); }
+    .summary-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0d0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Liquor Count">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+</head>
+<body>
+
+<div class="pin-overlay" id="pinOverlay" style="display:none">
+  <div class="pin-box">
+    <h2>Manager Access</h2>
+    <p id="pinSubtitle">Enter 4-digit PIN</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="dot0"></div>
+      <div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div>
+      <div class="pin-dot" id="dot3"></div>
+    </div>
+    <div class="pin-keypad">
+      <div class="pin-key" onclick="pinPress('1')">1</div>
+      <div class="pin-key" onclick="pinPress('2')">2</div>
+      <div class="pin-key" onclick="pinPress('3')">3</div>
+      <div class="pin-key" onclick="pinPress('4')">4</div>
+      <div class="pin-key" onclick="pinPress('5')">5</div>
+      <div class="pin-key" onclick="pinPress('6')">6</div>
+      <div class="pin-key" onclick="pinPress('7')">7</div>
+      <div class="pin-key" onclick="pinPress('8')">8</div>
+      <div class="pin-key" onclick="pinPress('9')">9</div>
+      <div class="pin-key clear" onclick="pinClear()">⌫</div>
+      <div class="pin-key zero" onclick="pinPress('0')">0</div>
+      <div class="pin-key secondary" onclick="pinCancel()" style="font-size:13px; color:var(--muted)">✕</div>
+    </div>
+    <div class="pin-error" id="pinError"></div>
+  </div>
+</div>
+
+<header>
+  <div class="header-left">
+    <h1>82nd Sports Pub</h1>
+    <p>Daily Liquor Count — Scale Weight System</p>
+  </div>
+  <div class="shift-info">
+    <input type="text" id="staffName" placeholder="Staff name" style="width:120px">
+    <select id="shiftType">
+      <option value="open">Opening</option>
+      <option value="close">Closing</option>
+      <option value="mid">Mid Shift</option>
+    </select>
+    <input type="date" id="shiftDate">
+    <button class="btn" onclick="saveShift()">Save Shift</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('count')">Count Sheet</div>
+  <div class="tab" onclick="switchTab('summary')">Summary</div>
+  <div class="tab" onclick="requirePin('history')">History <span class="lock-icon">🔒</span></div>
+  <div class="tab" onclick="requirePin('settings')">Settings <span class="lock-icon">🔒</span></div>
+</div>
+
+<div class="section active" id="tab-count">
+  <div class="help-box">
+    <strong>How to use:</strong> Weigh bottles in <code>lb:oz scale mode as ounces only</code> if your scale allows it. Enter the actual start and end scale weights. The app uses each bottle's <strong>full weight</strong> and <strong>empty weight</strong> to estimate remaining liquor and low stock. Beer/coolers are counted by units.
+  </div>
+
+  <div class="filter-bar">
+    <input id="searchBox" type="search" placeholder="Search item..." oninput="applyFilters()" style="min-width:180px;">
+    <select id="categoryFilter" onchange="applyFilters()">
+      <option value="">All categories</option>
+    </select>
+    <select id="methodFilter" onchange="applyFilters()">
+      <option value="">All methods</option>
+      <option value="weight">Bottle weight</option>
+      <option value="count">Unit count</option>
+    </select>
+    <button class="btn secondary small" onclick="fillOpeningFromFull()">Set starts to full</button>
+    <button class="btn secondary small" onclick="copyEndToStart()">Copy end → next start</button>
+  </div>
+
+  <div class="alert-banner negative" id="negativeAlert">
+    ⚠️ <span id="negText">Some items show negative usage — check your end-of-shift numbers.</span>
+  </div>
+  <div class="alert-banner low" id="lowAlert">
+    🔶 <span id="lowText">Some bottles are running low and need restocking.</span>
+  </div>
+
+  <div class="col-header">
+    <span>Item</span>
+    <span>Full Scale Oz</span>
+    <span>Empty Scale Oz</span>
+    <span>Start</span>
+    <span>End</span>
+    <span>Used / Left</span>
+    <span>Notes</span>
+  </div>
+
+  <div id="inventoryList"></div>
+</div>
+
+<div class="section" id="tab-summary">
+  <div class="stat-bar">
+    <div class="stat">
+      <div class="num" id="statFilled">0</div>
+      <div class="label">Counted</div>
+      <div class="progress-outer"><div class="progress-inner" id="statProgress" style="width:0%"></div></div>
+    </div>
+    <div class="stat">
+      <div class="num green" id="statUsedOz">0</div>
+      <div class="label">Liquor Oz Used</div>
+    </div>
+    <div class="stat">
+      <div class="num orange" id="statLow">0</div>
+      <div class="label">Low Stock</div>
+    </div>
+    <div class="stat">
+      <div class="num red" id="statAlerts">0</div>
+      <div class="label">Anomalies</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="statTotal">0</div>
+      <div class="label">Total Items</div>
+    </div>
+  </div>
+  <div class="summary-grid" id="summaryGrid"></div>
+</div>
+
+<div class="section" id="tab-history">
+  <div style="display:flex; gap:10px; margin-bottom:14px; align-items:center; flex-wrap:wrap;">
+    <span style="font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--accent); letter-spacing:1px;">Saved Shifts</span>
+    <button class="btn secondary" onclick="exportCSV()" style="margin-left:auto;">Export Last CSV</button>
+    <button class="btn secondary" onclick="exportAllCSV()">Export All CSV</button>
+    <button class="btn danger" onclick="clearHistory()">Clear All</button>
+  </div>
+  <div class="history-list" id="historyList"></div>
+</div>
+
+<div class="section" id="tab-settings">
+  <div class="settings-section">
+    <h2>Manager PIN</h2>
+    <div class="setting-row">
+      <label>
+        Current PIN
+        <span class="sub">Default is 1982. Change it below.</span>
+      </label>
+      <input class="setting-input" type="password" id="currentPinShow" placeholder="••••" maxlength="4" readonly value="••••">
+    </div>
+    <div class="setting-row">
+      <label>New PIN <span class="sub">4 digits</span></label>
+      <input class="setting-input" type="password" id="newPin" placeholder="New PIN" maxlength="4" inputmode="numeric">
+    </div>
+    <div class="setting-row">
+      <label>Confirm PIN</label>
+      <input class="setting-input" type="password" id="confirmPin" placeholder="Confirm" maxlength="4" inputmode="numeric">
+    </div>
+    <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+      <button class="btn" onclick="savePin()">Update PIN</button>
+      <span id="pinSaveMsg" style="font-family:'DM Mono',monospace; font-size:11px; color:var(--green);"></span>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <h2>Par-Level Alert Thresholds</h2>
+    <div class="setting-row" style="margin-bottom:8px;">
+      <label>
+        Critical threshold
+        <span class="sub">Alert when remaining stock is below this percent of a full bottle.</span>
+      </label>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <input class="setting-input" type="number" id="critPct" min="0" max="100" value="20" style="width:70px">
+        <span style="font-family:'DM Mono',monospace; font-size:12px; color:var(--muted);">%</span>
+      </div>
+    </div>
+    <div class="setting-row" style="margin-bottom:14px;">
+      <label>
+        Warning threshold
+        <span class="sub">Alert when remaining stock is below this percent of a full bottle.</span>
+      </label>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <input class="setting-input" type="number" id="warnPct" min="0" max="100" value="40" style="width:70px">
+        <span style="font-family:'DM Mono',monospace; font-size:12px; color:var(--muted);">%</span>
+      </div>
+    </div>
+    <button class="btn" onclick="saveThresholds()">Save Thresholds & Bottle Weights</button>
+    <span id="threshSaveMsg" style="font-family:'DM Mono',monospace; font-size:11px; color:var(--green); margin-left:10px;"></span>
+  </div>
+
+  <div class="settings-section">
+    <h2>Bottle Size & Scale Weight Master List</h2>
+    <div class="help-box">
+      <strong>Important:</strong> The <strong>Size</strong> column is the bottle’s liquid volume, like 750ml, 1.14L, or 50 fl oz. The <strong>Full Scale Oz</strong> and <strong>Empty Scale Oz</strong> columns are the actual weights from your scale. So it is normal to see 750ml under Size and 43 under Full Scale Oz. For best accuracy, weigh one full bottle and one empty bottle with cap, then update those two weight columns.
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+      <button class="btn secondary small" onclick="downloadWeightTemplate()">Export Weight Template CSV</button>
+      <button class="btn secondary small" onclick="resetWeightsToDefaults()">Reset Defaults</button>
+    </div>
+    <div class="table-wrap">
+      <table class="par-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Item</th>
+            <th>Method</th>
+            <th>Size</th>
+            <th>Full Scale Oz / Par</th>
+            <th>Empty Scale Oz</th>
+            <th>Verified?</th>
+          </tr>
+        </thead>
+        <tbody id="parTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="export-bar">
+  <span id="progressText">Fill in start & end weights/counts for each item.</span>
+  <button class="btn secondary" onclick="window.print()">Print</button>
+  <button class="btn secondary" onclick="resetCurrent()">Reset</button>
+  <button class="btn" onclick="switchTab('summary')">Summary →</button>
+</div>
+
+<script>
+const LIQUID_WEIGHT_BY_SIZE = {
+  "750ml": 25.4,
+  "1.14L": 38.6,
+  "1.5L": 50.7,
+  "50 Oz": 50.0,
+  "42 Oz": 42.0,
+  "44 Oz": 44.0,
+  "52 Oz": 52.0,
+  "43 Oz": 43.0,
+  "41 Oz": 41.0,
+  "40 Oz": 40.0,
+  "28 Oz": 28.0,
+  "355ml": 12.0,
+  "341ml": 11.5,
+  "250ml": 8.5
+};
+
+const ITEMS = [
+  { cat:"TOP SHELF", name:"JAMESON", method:"weight", size:"750ml", full:43, empty:17, verified:false },
+  { cat:"TOP SHELF", name:"KRAKEN", method:"weight", size:"750ml", full:44, empty:18, verified:false },
+  { cat:"TOP SHELF", name:"GLENFIDDICH", method:"weight", size:"750ml", full:45, empty:20, verified:false },
+  { cat:"TOP SHELF", name:"RED LABEL", method:"weight", size:"750ml", full:42, empty:16, verified:false },
+  { cat:"TOP SHELF", name:"CANADIAN CLUB", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"TOP SHELF", name:"PATRON", method:"weight", size:"750ml", full:53, empty:27, verified:false },
+  { cat:"TOP SHELF", name:"HENNESSY", method:"weight", size:"750ml", full:49, empty:23, verified:false },
+  { cat:"TOP SHELF", name:"J.P. WISER'S DELUXE", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"TOP SHELF", name:"BOMBAY GIN", method:"weight", size:"750ml", full:43, empty:17, verified:false },
+  { cat:"TOP SHELF", name:"BUMBU", method:"weight", size:"750ml", full:48, empty:22, verified:false },
+  { cat:"TOP SHELF", name:"APPLETON", method:"weight", size:"750ml", full:42, empty:16, verified:false },
+  { cat:"TOP SHELF", name:"GOLDEN PEAR", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+
+  { cat:"LIQUEURS", name:"DISARONNO", method:"weight", size:"750ml", full:45, empty:19, verified:false },
+  { cat:"LIQUEURS", name:"GRAND MARNIER", method:"weight", size:"750ml", full:47, empty:21, verified:false },
+  { cat:"LIQUEURS", name:"KAHLUA", method:"weight", size:"750ml", full:42, empty:16, verified:false },
+  { cat:"LIQUEURS", name:"BAILEYS", method:"weight", size:"750ml", full:43, empty:17, verified:false },
+  { cat:"LIQUEURS", name:"FRANGELICO", method:"weight", size:"750ml", full:50, empty:24, verified:false },
+  { cat:"LIQUEURS", name:"DR. MCGILLICUDDY PEACH", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"LIQUEURS", name:"GOLDSCHLAGER", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+
+  { cat:"MCGUINNESS", name:"DE BANANA", method:"weight", size:"50 Oz", full:50, empty:0, verified:true },
+  { cat:"MCGUINNESS", name:"TRIPLE SEC", method:"weight", size:"50 Oz", full:50, empty:0, verified:true },
+  { cat:"MCGUINNESS", name:"PEPPERMINT SCHNAPPS", method:"weight", size:"50 Oz", full:50, empty:0, verified:true },
+  { cat:"MCGUINNESS", name:"CHERRY", method:"weight", size:"50 Oz", full:50, empty:0, verified:true },
+  { cat:"MCGUINNESS", name:"CRÈME DE CACAO", method:"weight", size:"50 Oz", full:50, empty:0, verified:true },
+  { cat:"MCGUINNESS", name:"CRÈME DE MENTHE", method:"weight", size:"50 Oz", full:50, empty:0, verified:true },
+  { cat:"MCGUINNESS", name:"BLUE CURACAO", method:"weight", size:"50 Oz", full:50, empty:0, verified:true },
+  { cat:"MCGUINNESS", name:"PEACH SCHNAPPS", method:"weight", size:"50 Oz", full:50, empty:0, verified:true },
+
+  { cat:"SCHNAPPS / SOURS", name:"SOUR PUSS GREEN", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"SCHNAPPS / SOURS", name:"SOUR PUSS RED", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"SCHNAPPS / SOURS", name:"PHILLIPS ROOT BEER", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"SCHNAPPS / SOURS", name:"PHILLIPS BUTTER RIPPLE", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+
+  { cat:"VODKA / RUM", name:"MALIBU", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"VODKA / RUM", name:"SMIRNOFF", method:"weight", size:"42 Oz", full:42, empty:0, verified:true },
+  { cat:"VODKA / RUM", name:"SMIRNOFF BLUEBERRY", method:"weight", size:"42 Oz", full:42, empty:0, verified:true },
+  { cat:"VODKA / RUM", name:"SMIRNOFF RASPBERRY", method:"weight", size:"42 Oz", full:42, empty:0, verified:true },
+
+  { cat:"TEQUILA", name:"JOSE CUERVO", method:"weight", size:"44 Oz", full:44, empty:0, verified:true },
+  { cat:"TEQUILA", name:"TEREMANA", method:"weight", size:"750ml", full:45, empty:19, verified:false },
+  { cat:"TEQUILA", name:"1800 SILVER", method:"weight", size:"52 Oz", full:52, empty:0, verified:true },
+  { cat:"TEQUILA", name:"1800 COCONUT", method:"weight", size:"52 Oz", full:52, empty:0, verified:true },
+
+  { cat:"WHISKY / BOURBON", name:"CROWN ROYAL", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"WHISKY / BOURBON", name:"CROWN ROYAL APPLE", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"WHISKY / BOURBON", name:"JACK DANIEL'S", method:"weight", size:"750ml", full:42, empty:16, verified:false },
+  { cat:"WHISKY / BOURBON", name:"JACK DANIEL'S HONEY", method:"weight", size:"43 Oz", full:43, empty:0, verified:true },
+  { cat:"WHISKY / BOURBON", name:"JIM BEAM BLACK", method:"weight", size:"750ml", full:41, empty:16, verified:true },
+  { cat:"WHISKY / BOURBON", name:"JIM BEAM", method:"weight", size:"750ml", full:41, empty:16, verified:true },
+
+  { cat:"SPECIALTY", name:"LONG ISLAND ICED TEA MIX", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"SPECIALTY", name:"JAGERMEISTER", method:"weight", size:"750ml", full:44, empty:18, verified:false },
+  { cat:"SPECIALTY", name:"FIREBALL", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"SPECIALTY", name:"SAMBUCA", method:"weight", size:"750ml", full:42, empty:16, verified:false },
+  { cat:"SPECIALTY", name:"SAMBUCA BLACK", method:"weight", size:"750ml", full:42, empty:16, verified:false },
+  { cat:"SPECIALTY", name:"BAJA", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"SPECIALTY", name:"YUKON JACK", method:"weight", size:"43 Oz", full:43, empty:0, verified:true },
+  { cat:"SPECIALTY", name:"SOUTHERN COMFORT", method:"weight", size:"750ml", full:40, empty:17, verified:true },
+  { cat:"SPECIALTY", name:"DR. MCGILLICUDDY BUTTERSCOTCH", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+
+  { cat:"HOUSE SPIRITS", name:"ROYAL RESERVE", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+  { cat:"HOUSE SPIRITS", name:"ALBERTA PURE", method:"weight", size:"40 Oz", full:40, empty:0, verified:true },
+  { cat:"HOUSE SPIRITS", name:"BACARDI", method:"weight", size:"28 Oz", full:28, empty:0, verified:true },
+  { cat:"HOUSE SPIRITS", name:"CAPTAIN MORGAN", method:"weight", size:"41 Oz", full:41, empty:0, verified:true },
+  { cat:"HOUSE SPIRITS", name:"ALBERTA PREMIUM", method:"weight", size:"750ml", full:41, empty:16, verified:false },
+
+  { cat:"WINE", name:"RED WINE", method:"weight", size:"1.5L", full:76, empty:25, verified:false },
+  { cat:"WINE", name:"WHITE WINE", method:"weight", size:"1.5L", full:76, empty:25, verified:false },
+
+  { cat:"DOMESTIC BEER", name:"MOLSON CANADIAN", method:"count", size:"341ml", full:24, empty:0, verified:true },
+  { cat:"DOMESTIC BEER", name:"BUDWEISER", method:"count", size:"341ml", full:24, empty:0, verified:true },
+  { cat:"DOMESTIC BEER", name:"BUD LIGHT", method:"count", size:"341ml", full:24, empty:0, verified:true },
+  { cat:"DOMESTIC BEER", name:"COORS LIGHT", method:"count", size:"341ml", full:24, empty:0, verified:true },
+  { cat:"DOMESTIC BEER", name:"PILSNER", method:"count", size:"341ml", full:24, empty:0, verified:true },
+  { cat:"DOMESTIC BEER", name:"KOKANEE", method:"count", size:"341ml", full:24, empty:0, verified:true },
+  { cat:"DOMESTIC BEER", name:"MICHELOB ULTRA", method:"count", size:"341ml", full:24, empty:0, verified:true },
+
+  { cat:"IMPORT BEER", name:"CORONA", method:"count", size:"330ml", full:24, empty:0, verified:true },
+  { cat:"IMPORT BEER", name:"HEINEKEN", method:"count", size:"330ml", full:24, empty:0, verified:true },
+  { cat:"IMPORT BEER", name:"STELLA ARTOIS", method:"count", size:"330ml", full:24, empty:0, verified:true },
+  { cat:"IMPORT BEER", name:"ALEXANDER KEITH'S", method:"count", size:"341ml", full:24, empty:0, verified:true },
+  { cat:"IMPORT BEER", name:"MILLER GENUINE DRAFT", method:"count", size:"341ml", full:24, empty:0, verified:true },
+
+  { cat:"COOLERS & RTD", name:"SMIRNOFF ICE (Bottles)", method:"count", size:"341ml", full:24, empty:0, verified:true },
+  { cat:"COOLERS & RTD", name:"TWISTED TEA (Cans)", method:"count", size:"355ml", full:24, empty:0, verified:true },
+  { cat:"COOLERS & RTD", name:"BARRYBLAST REGULAR (Cans)", method:"count", size:"355ml", full:24, empty:0, verified:true },
+  { cat:"COOLERS & RTD", name:"BARRYBLAST ZERO SUGAR (Cans)", method:"count", size:"355ml", full:24, empty:0, verified:true },
+  { cat:"COOLERS & RTD", name:"RED BULL (Cans)", method:"count", size:"250ml", full:24, empty:0, verified:true },
+  { cat:"COOLERS & RTD", name:"WATER (Bottles)", method:"count", size:"500ml", full:24, empty:0, verified:true },
+  { cat:"COOLERS & RTD", name:"TONIC WATER (Cans)", method:"count", size:"355ml", full:24, empty:0, verified:true },
+];
+
+let counts = {};
+let managerUnlocked = false;
+let pendingTab = null;
+let pinEntry = '';
+
+function itemKey(item) {
+  return (item.cat + '_' + item.name).replace(/[^a-zA-Z0-9]+/g,'_').replace(/^_|_$/g,'').toUpperCase();
+}
+
+function defaultWeights() {
+  const obj = {};
+  ITEMS.forEach(item => {
+    const k = itemKey(item);
+    obj[k] = { full: item.full, empty: item.empty, verified: !!item.verified, method:item.method, size:item.size };
+  });
+  return obj;
+}
+
+function getSettings() {
+  const defaults = { pin: '1982', critPct: 20, warnPct: 40, weights: defaultWeights() };
+  const saved = JSON.parse(localStorage.getItem('82nd_settings_v2') || '{}');
+  const merged = { ...defaults, ...saved };
+  merged.weights = { ...defaultWeights(), ...(saved.weights || {}) };
+  return merged;
+}
+
+function saveSettings(s) {
+  localStorage.setItem('82nd_settings_v2', JSON.stringify(s));
+}
+
+function getWeightRecord(key) {
+  const s = getSettings();
+  return s.weights[key] || defaultWeights()[key];
+}
+
+function num(v) {
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+function getRemainingPct(key) {
+  const c = counts[key];
+  const wr = getWeightRecord(key);
+  if (!c || c.end === '') return null;
+  const endVal = num(c.end);
+  if (endVal === null) return null;
+
+  if (wr.method === 'count') {
+    if (!wr.full || wr.full <= 0) return null;
+    return Math.round((endVal / wr.full) * 100);
+  }
+
+  const usable = wr.full - wr.empty;
+  if (usable <= 0) {
+    if (!wr.full || wr.full <= 0) return null;
+    return Math.round((endVal / wr.full) * 100);
+  }
+
+  const remainingLiquid = endVal - wr.empty;
+  return Math.round((remainingLiquid / usable) * 100);
+}
+
+function getAlertLevel(key) {
+  const s = getSettings();
+  const pct = getRemainingPct(key);
+  if (pct === null) return null;
+  if (pct <= s.critPct) return 'critical';
+  if (pct <= s.warnPct) return 'warning';
+  return null;
+}
+
+function getUsed(key) {
+  const c = counts[key];
+  if (!c || c.start === '' || c.end === '') return null;
+  const start = num(c.start);
+  const end = num(c.end);
+  if (start === null || end === null) return null;
+  return start - end;
+}
+
+function buildCategoryFilter() {
+  const sel = document.getElementById('categoryFilter');
+  const existing = sel.value;
+  const cats = [...new Set(ITEMS.map(i => i.cat))];
+  sel.innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+  sel.value = existing || '';
+}
+
+function buildList() {
+  buildCategoryFilter();
+  const container = document.getElementById('inventoryList');
+  container.innerHTML = '';
+  let currentCat = '';
+
+  ITEMS.forEach(item => {
+    if (item.cat !== currentCat) {
+      currentCat = item.cat;
+      const catEl = document.createElement('div');
+      catEl.className = 'category-label';
+      catEl.dataset.cat = item.cat;
+      catEl.textContent = item.cat;
+      container.appendChild(catEl);
+    }
+
+    const key = itemKey(item);
+    if (!counts[key]) counts[key] = { start:'', end:'', notes:'' };
+    const c = counts[key];
+    const alert = getAlertLevel(key);
+    const wr = getWeightRecord(key);
+
+    const row = document.createElement('div');
+    row.className = 'item-row' + (alert === 'critical' ? ' low-alert' : alert === 'warning' ? ' warn-alert' : '');
+    row.id = 'row_' + key;
+    row.dataset.name = item.name.toLowerCase();
+    row.dataset.cat = item.cat;
+    row.dataset.method = wr.method;
+
+    const alertBadge = alert === 'critical'
+      ? '<span class="low-badge critical">LOW</span>'
+      : alert === 'warning'
+      ? '<span class="low-badge warning">LOW</span>'
+      : '';
+
+    const methodLabel = wr.method === 'count' ? 'count' : 'oz scale';
+
+    row.innerHTML = `
+      <div class="item-name">
+        <div class="item-name-main">
+          ${item.name}
+          <div>
+            <span class="size-tag">${wr.size || item.size || ''}</span>
+            <span class="method-tag">${methodLabel}</span>
+          </div>
+        </div>
+        ${alertBadge}
+      </div>
+      <div class="readonly-pill">${formatNum(wr.full)}</div>
+      <div class="readonly-pill">${wr.method === 'count' ? '—' : formatNum(wr.empty)}</div>
+      <input class="count-input${c.start !== '' ? ' filled' : ''}" type="number" min="0" step="0.1" placeholder="${wr.method === 'count' ? 'qty' : 'oz'}"
+        value="${c.start}"
+        oninput="updateCount('${key}', 'start', this.value); this.classList.toggle('filled', this.value !== '')">
+      <input class="count-input${c.end !== '' ? ' filled' : ''}" type="number" min="0" step="0.1" placeholder="${wr.method === 'count' ? 'qty' : 'oz'}"
+        value="${c.end}"
+        oninput="updateCount('${key}', 'end', this.value); this.classList.toggle('filled', this.value !== '')">
+      <div class="used-cell" id="usedcell_${key}">
+        ${buildUsedCell(key)}
+      </div>
+      <input class="notes-input" type="text" placeholder="note"
+        value="${escapeAttr(c.notes)}"
+        oninput="updateCount('${key}', 'notes', this.value)">
+    `;
+
+    container.appendChild(row);
+  });
+
+  applyFilters();
+  updateStats();
+  checkAlerts();
+}
+
+function formatNum(v) {
+  const n = num(v);
+  if (n === null) return '—';
+  return (Math.round(n * 10) / 10).toFixed(n % 1 === 0 ? 0 : 1);
+}
+
+function escapeAttr(s) {
+  return String(s || '').replace(/"/g, '&quot;');
+}
+
+function buildUsedCell(key) {
+  const c = counts[key];
+  const wr = getWeightRecord(key);
+  const used = getUsed(key);
+  if (used === null) return `<div class="used-val zero">—</div>`;
+
+  const pct = getRemainingPct(key);
+  const pctStr = pct !== null ? `${pct}%` : '';
+  const s = getSettings();
+
+  let barColor = '#27ae60';
+  if (pct !== null && pct <= s.critPct) barColor = '#e74c3c';
+  else if (pct !== null && pct <= s.warnPct) barColor = '#e67e22';
+
+  let valClass = used < 0 ? 'negative' : used === 0 ? 'zero' : 'positive';
+  const unit = wr.method === 'count' ? '' : 'oz';
+  let valStr = used < 0 ? `▲${Math.abs(used).toFixed(1)}` : used.toFixed(1);
+
+  const barWidth = pct !== null ? clamp(pct, 0, 100) : 0;
+  const barHtml = pct !== null ? `
+    <div class="pct-bar-outer" title="${pct}% remaining">
+      <div class="pct-bar-inner" style="width:${barWidth}%; background:${barColor};"></div>
+    </div>` : '';
+
+  return `<div class="used-val ${valClass}">${valStr}${unit ? ' ' + unit : ''}${pctStr ? `<span style="font-size:9px; color:var(--muted); margin-left:4px;">${pctStr}</span>` : ''}</div>${barHtml}`;
+}
+
+function updateCount(key, field, val) {
+  if (!counts[key]) counts[key] = { start:'', end:'', notes:'' };
+  counts[key][field] = val;
+  const cellEl = document.getElementById('usedcell_' + key);
+  if (cellEl) cellEl.innerHTML = buildUsedCell(key);
+
+  const row = document.getElementById('row_' + key);
+  if (row) {
+    const alert = getAlertLevel(key);
+    row.className = 'item-row' + (alert === 'critical' ? ' low-alert' : alert === 'warning' ? ' warn-alert' : '');
+    const nameDiv = row.querySelector('.item-name');
+    const existingBadge = nameDiv.querySelector('.low-badge');
+    if (existingBadge) existingBadge.remove();
+    if (alert === 'critical') nameDiv.insertAdjacentHTML('beforeend', '<span class="low-badge critical">LOW</span>');
+    else if (alert === 'warning') nameDiv.insertAdjacentHTML('beforeend', '<span class="low-badge warning">LOW</span>');
+  }
+
+  updateStats();
+  checkAlerts();
+}
+
+function updateStats() {
+  let filled = 0, anomalies = 0, lowCount = 0, totalUsedOz = 0;
+  const total = ITEMS.length;
+  ITEMS.forEach(item => {
+    const key = itemKey(item);
+    const wr = getWeightRecord(key);
+    const c = counts[key];
+    if (c && c.start !== '' && c.end !== '') {
+      filled++;
+      const used = getUsed(key);
+      if (used !== null) {
+        if (used < 0) anomalies++;
+        if (wr.method === 'weight' && used > 0) totalUsedOz += used;
+      }
+      const al = getAlertLevel(key);
+      if (al) lowCount++;
+    }
+  });
+
+  document.getElementById('statFilled').textContent = filled;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statAlerts').textContent = anomalies;
+  document.getElementById('statLow').textContent = lowCount;
+  document.getElementById('statUsedOz').textContent = totalUsedOz.toFixed(1);
+  document.getElementById('statProgress').style.width = (filled / total * 100) + '%';
+
+  let msg = `${filled} of ${total} items counted`;
+  if (totalUsedOz > 0) msg += ` · ${totalUsedOz.toFixed(1)} oz liquor used`;
+  if (lowCount > 0) msg += ` · ${lowCount} low stock`;
+  if (anomalies > 0) msg += ` · ${anomalies} anomalies`;
+  document.getElementById('progressText').textContent = msg;
+}
+
+function checkAlerts() {
+  let hasNeg = false, hasLow = false, lowItems = [], negCount = 0;
+  ITEMS.forEach(item => {
+    const key = itemKey(item);
+    const used = getUsed(key);
+    if (used !== null) {
+      if (used < 0) { hasNeg = true; negCount++; }
+      const al = getAlertLevel(key);
+      if (al) { hasLow = true; lowItems.push(item.name); }
+    }
+  });
+
+  const negBanner = document.getElementById('negativeAlert');
+  negBanner.classList.toggle('show', hasNeg);
+  if (hasNeg) document.getElementById('negText').textContent = `${negCount} item(s) show negative usage — check your end-of-shift numbers.`;
+
+  const lowBanner = document.getElementById('lowAlert');
+  lowBanner.classList.toggle('show', hasLow);
+  if (hasLow) document.getElementById('lowText').textContent = `Low stock: ${lowItems.slice(0,5).join(', ')}${lowItems.length > 5 ? ` +${lowItems.length - 5} more` : ''}`;
+}
+
+function applyFilters() {
+  const q = (document.getElementById('searchBox')?.value || '').toLowerCase().trim();
+  const cat = document.getElementById('categoryFilter')?.value || '';
+  const method = document.getElementById('methodFilter')?.value || '';
+  const rows = document.querySelectorAll('.item-row');
+
+  rows.forEach(row => {
+    const show = (!q || row.dataset.name.includes(q)) &&
+                 (!cat || row.dataset.cat === cat) &&
+                 (!method || row.dataset.method === method);
+    row.classList.toggle('hidden', !show);
+  });
+
+  document.querySelectorAll('.category-label').forEach(label => {
+    const catRows = [...document.querySelectorAll(`.item-row[data-cat="${CSS.escape(label.dataset.cat)}"]`)];
+    label.style.display = catRows.some(r => !r.classList.contains('hidden')) ? '' : 'none';
+  });
+}
+
+function fillOpeningFromFull() {
+  if (!confirm('Set blank START fields to each item full weight/par?')) return;
+  ITEMS.forEach(item => {
+    const key = itemKey(item);
+    const wr = getWeightRecord(key);
+    if (!counts[key]) counts[key] = { start:'', end:'', notes:'' };
+    if (counts[key].start === '') counts[key].start = String(wr.full);
+  });
+  buildList();
+}
+
+function copyEndToStart() {
+  if (!confirm('Copy every END value into START and clear END values? Useful for the next shift.')) return;
+  ITEMS.forEach(item => {
+    const key = itemKey(item);
+    if (!counts[key]) counts[key] = { start:'', end:'', notes:'' };
+    if (counts[key].end !== '') {
+      counts[key].start = counts[key].end;
+      counts[key].end = '';
+    }
+  });
+  buildList();
+}
+
+function buildSummary() {
+  updateStats();
+  const cats = {};
+  ITEMS.forEach(item => {
+    const key = itemKey(item);
+    const wr = getWeightRecord(key);
+    if (!cats[item.cat]) cats[item.cat] = [];
+    const used = getUsed(key);
+    const pct = getRemainingPct(key);
+    const alert = getAlertLevel(key);
+    cats[item.cat].push({ name: item.name, used, pct, alert, method: wr.method });
+  });
+
+  const grid = document.getElementById('summaryGrid');
+  grid.innerHTML = '';
+  Object.keys(cats).forEach(cat => {
+    const card = document.createElement('div');
+    card.className = 'summary-card';
+    let html = `<h3>${cat}</h3>`;
+    cats[cat].forEach(item => {
+      let valClass = 'none', valStr = '—';
+      if (item.used !== null) {
+        valClass = item.used < 0 ? 'neg' : item.used === 0 ? 'none' : 'pos';
+        valStr = item.used < 0 ? `▲${Math.abs(item.used).toFixed(1)}` : item.used.toFixed(1);
+        if (item.method === 'weight') valStr += ' oz';
+        if (item.alert === 'warning') valClass = 'warn';
+      }
+      const indicator = item.alert === 'critical'
+        ? '<span class="low-indicator crit">RESTOCK</span>'
+        : item.alert === 'warning'
+        ? '<span class="low-indicator warn">LOW</span>'
+        : '';
+      const pctDisp = item.pct !== null ? `<span style="font-size:10px; color:var(--muted); margin-left:4px;">${item.pct}%</span>` : '';
+      html += `<div class="summary-row">
+        <span class="name">${item.name}</span>
+        ${indicator}
+        <span class="val ${valClass}">${valStr}${pctDisp}</span>
+      </div>`;
+    });
+    card.innerHTML = html;
+    grid.appendChild(card);
+  });
+}
+
+function savePin() {
+  const np = document.getElementById('newPin').value;
+  const cp = document.getElementById('confirmPin').value;
+  const msg = document.getElementById('pinSaveMsg');
+  if (np.length !== 4 || isNaN(np)) { msg.style.color = 'var(--red)'; msg.textContent = 'PIN must be 4 digits.'; return; }
+  if (np !== cp) { msg.style.color = 'var(--red)'; msg.textContent = 'PINs do not match.'; return; }
+  const s = getSettings();
+  s.pin = np;
+  saveSettings(s);
+  msg.style.color = 'var(--green)';
+  msg.textContent = 'PIN updated ✓';
+  document.getElementById('newPin').value = '';
+  document.getElementById('confirmPin').value = '';
+  setTimeout(() => msg.textContent = '', 3000);
+}
+
+function saveThresholds() {
+  const crit = parseInt(document.getElementById('critPct').value);
+  const warn = parseInt(document.getElementById('warnPct').value);
+  const msg = document.getElementById('threshSaveMsg');
+  if (isNaN(crit) || isNaN(warn) || crit >= warn) {
+    msg.style.color = 'var(--red)'; msg.textContent = 'Warning % must be higher than Critical %.'; return;
+  }
+
+  const s = getSettings();
+  s.critPct = crit; s.warnPct = warn;
+
+  document.querySelectorAll('.weight-full-input').forEach(inp => {
+    const key = inp.dataset.key;
+    if (!s.weights[key]) s.weights[key] = {};
+    s.weights[key].full = num(inp.value) ?? 0;
+  });
+  document.querySelectorAll('.weight-empty-input').forEach(inp => {
+    const key = inp.dataset.key;
+    if (!s.weights[key]) s.weights[key] = {};
+    s.weights[key].empty = num(inp.value) ?? 0;
+  });
+  document.querySelectorAll('.weight-verified-input').forEach(inp => {
+    const key = inp.dataset.key;
+    if (!s.weights[key]) s.weights[key] = {};
+    s.weights[key].verified = inp.checked;
+  });
+
+  saveSettings(s);
+  msg.style.color = 'var(--green)';
+  msg.textContent = 'Saved ✓';
+  setTimeout(() => msg.textContent = '', 3000);
+  buildList();
+}
+
+function buildParTable() {
+  const s = getSettings();
+  document.getElementById('critPct').value = s.critPct;
+  document.getElementById('warnPct').value = s.warnPct;
+
+  const tbody = document.getElementById('parTableBody');
+  tbody.innerHTML = '';
+  ITEMS.forEach(item => {
+    const key = itemKey(item);
+    const wr = getWeightRecord(key);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${item.cat}</td>
+      <td>${item.name}</td>
+      <td>${wr.method === 'count' ? 'Unit count' : 'Bottle weight'}</td>
+      <td>${wr.size || item.size || ''}</td>
+      <td><input class="par-input weight-full-input" data-key="${key}" type="number" min="0" step="0.1" value="${wr.full}"></td>
+      <td>${wr.method === 'count' ? '<span style="color:var(--muted);">N/A</span>' : `<input class="par-input weight-empty-input" data-key="${key}" type="number" min="0" step="0.1" value="${wr.empty}">`}</td>
+      <td style="text-align:center;"><input class="weight-verified-input" data-key="${key}" type="checkbox" ${wr.verified ? 'checked' : ''}></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+const TABS = ['count','summary','history','settings'];
+
+function switchTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  const idx = TABS.indexOf(tab);
+  if (idx >= 0) document.querySelectorAll('.tab')[idx].classList.add('active');
+  if (tab === 'summary') buildSummary();
+  if (tab === 'history') buildHistory();
+  if (tab === 'settings') buildParTable();
+}
+
+function requirePin(tab) {
+  if (managerUnlocked) { switchTab(tab); return; }
+  pendingTab = tab;
+  pinEntry = '';
+  document.getElementById('pinError').textContent = '';
+  updatePinDots();
+  document.getElementById('pinOverlay').style.display = 'flex';
+}
+
+function pinPress(d) {
+  if (pinEntry.length >= 4) return;
+  pinEntry += d;
+  updatePinDots();
+  if (pinEntry.length === 4) setTimeout(checkPin, 120);
+}
+
+function pinClear() {
+  pinEntry = pinEntry.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pinError').textContent = '';
+}
+
+function pinCancel() {
+  document.getElementById('pinOverlay').style.display = 'none';
+  pinEntry = '';
+}
+
+function updatePinDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('dot' + i).classList.toggle('filled', i < pinEntry.length);
+  }
+}
+
+function checkPin() {
+  const s = getSettings();
+  if (pinEntry === s.pin) {
+    managerUnlocked = true;
+    document.getElementById('pinOverlay').style.display = 'none';
+    if (pendingTab) switchTab(pendingTab);
+  } else {
+    document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
+    pinEntry = '';
+    updatePinDots();
+    const dotsEl = document.querySelector('.pin-dots');
+    dotsEl.style.transform = 'translateX(-8px)';
+    setTimeout(() => { dotsEl.style.transform = 'translateX(8px)'; }, 80);
+    setTimeout(() => { dotsEl.style.transform = 'translateX(0)'; }, 160);
+  }
+}
+
+function saveShift() {
+  const staff = document.getElementById('staffName').value || 'Unknown';
+  const shift = document.getElementById('shiftType').value;
+  const date = document.getElementById('shiftDate').value || new Date().toISOString().split('T')[0];
+  const history = JSON.parse(localStorage.getItem('82nd_history_v2') || '[]');
+  const entry = { 
+    date, shift, staff, 
+    counts: JSON.parse(JSON.stringify(counts)), 
+    settingsSnapshot: getSettings(),
+    saved: Date.now() 
+  };
+  history.unshift(entry);
+  localStorage.setItem('82nd_history_v2', JSON.stringify(history.slice(0,60)));
+
+  const filled = ITEMS.filter(i => { const k = itemKey(i); return counts[k] && counts[k].start !== '' && counts[k].end !== ''; }).length;
+  alert(`✓ Shift saved!\n${staff} · ${shift.toUpperCase()} · ${date}\n${filled} items counted.`);
+}
+
+function buildHistory() {
+  const history = JSON.parse(localStorage.getItem('82nd_history_v2') || '[]');
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+  if (history.length === 0) {
+    list.innerHTML = '<div style="color:var(--muted); font-family:\'DM Mono\',monospace; font-size:13px; padding:20px 0;">No saved shifts yet.</div>';
+    return;
+  }
+  const shiftMap = { open:'Opening', close:'Closing', mid:'Mid' };
+  history.forEach((entry, i) => {
+    const counted = ITEMS.filter(item => {
+      const k = itemKey(item);
+      return entry.counts[k] && entry.counts[k].start !== '' && entry.counts[k].end !== '';
+    }).length;
+
+    let usedOz = 0;
+    ITEMS.forEach(item => {
+      const k = itemKey(item);
+      const c = entry.counts[k];
+      const wr = (entry.settingsSnapshot?.weights?.[k]) || getWeightRecord(k);
+      if (c && c.start !== '' && c.end !== '' && wr.method === 'weight') {
+        const used = parseFloat(c.start) - parseFloat(c.end);
+        if (used > 0) usedOz += used;
+      }
+    });
+
+    const el = document.createElement('div');
+    el.className = 'history-entry';
+    el.innerHTML = `
+      <div>
+        <div class="title">${entry.date} — ${shiftMap[entry.shift] || entry.shift}</div>
+        <div class="meta">${entry.staff} · ${counted} items counted · ${usedOz.toFixed(1)} oz used · tap to load</div>
+      </div>
+      <span class="badge">${counted}/${ITEMS.length}</span>
+    `;
+    el.onclick = () => loadShift(i);
+    list.appendChild(el);
+  });
+}
+
+function loadShift(idx) {
+  const history = JSON.parse(localStorage.getItem('82nd_history_v2') || '[]');
+  const entry = history[idx];
+  counts = JSON.parse(JSON.stringify(entry.counts));
+  document.getElementById('staffName').value = entry.staff;
+  document.getElementById('shiftType').value = entry.shift;
+  document.getElementById('shiftDate').value = entry.date;
+  buildList();
+  switchTab('count');
+}
+
+function clearHistory() {
+  if (confirm('Clear ALL saved shift history? This cannot be undone.')) {
+    localStorage.removeItem('82nd_history_v2');
+    buildHistory();
+  }
+}
+
+function resetCurrent() {
+  if (confirm('Reset all counts for the current session?')) {
+    counts = {};
+    buildList();
+  }
+}
+
+function csvEscape(v) {
+  return `"${String(v ?? '').replace(/"/g,'""')}"`;
+}
+
+function buildCSVForEntry(entry) {
+  let csv = `82nd Sports Pub Liquor Count\nDate:,${entry.date}\nStaff:,${entry.staff}\nShift:,${entry.shift}\nSaved:,${new Date(entry.saved).toLocaleString()}\n\n`;
+  csv += 'Category,Item,Method,Size,Full Scale Oz/Par,Empty Scale Oz,Start,End,Used,Remaining %,Notes\n';
+  ITEMS.forEach(item => {
+    const key = itemKey(item);
+    const c = entry.counts[key] || { start:'', end:'', notes:'' };
+    const wr = (entry.settingsSnapshot?.weights?.[key]) || getWeightRecord(key);
+    let used = '';
+    let pct = '';
+    if (c.start !== '' && c.end !== '') {
+      used = (parseFloat(c.start) - parseFloat(c.end)).toFixed(1);
+      if (wr.method === 'count') {
+        pct = wr.full ? Math.round((parseFloat(c.end) / wr.full) * 100) + '%' : '';
+      } else {
+        const usable = wr.full - wr.empty;
+        pct = usable > 0 ? Math.round(((parseFloat(c.end) - wr.empty) / usable) * 100) + '%' : '';
+      }
+    }
+    csv += [
+      item.cat, item.name, wr.method, wr.size || item.size || '', wr.full, wr.method === 'count' ? '' : wr.empty,
+      c.start, c.end, used, pct, c.notes
+    ].map(csvEscape).join(',') + '\n';
+  });
+  return csv;
+}
+
+function downloadText(filename, text, type='text/csv') {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function exportCSV() {
+  const history = JSON.parse(localStorage.getItem('82nd_history_v2') || '[]');
+  if (history.length === 0) { alert('No saved shifts to export.'); return; }
+  const entry = history[0];
+  downloadText(`82nd_liquor_${entry.date}_${entry.shift}.csv`, buildCSVForEntry(entry));
+}
+
+function exportAllCSV() {
+  const history = JSON.parse(localStorage.getItem('82nd_history_v2') || '[]');
+  if (history.length === 0) { alert('No saved shifts to export.'); return; }
+  let csv = '';
+  history.forEach((entry, idx) => {
+    if (idx > 0) csv += '\n\n';
+    csv += buildCSVForEntry(entry);
+  });
+  downloadText(`82nd_liquor_all_history.csv`, csv);
+}
+
+function downloadWeightTemplate() {
+  const s = getSettings();
+  let csv = 'Category,Item,Method,Size,Full Scale Oz/Par,Empty Scale Oz,Verified\n';
+  ITEMS.forEach(item => {
+    const key = itemKey(item);
+    const wr = s.weights[key] || getWeightRecord(key);
+    csv += [item.cat, item.name, wr.method, wr.size || item.size || '', wr.full, wr.method === 'count' ? '' : wr.empty, wr.verified ? 'yes' : 'no'].map(csvEscape).join(',') + '\n';
+  });
+  downloadText('82nd_bottle_weight_master_list.csv', csv);
+}
+
+function resetWeightsToDefaults() {
+  if (!confirm('Reset all bottle weights/par levels to default values?')) return;
+  const s = getSettings();
+  s.weights = defaultWeights();
+  saveSettings(s);
+  buildParTable();
+  buildList();
+}
+
+document.addEventListener('keydown', (e) => {
+  const overlay = document.getElementById('pinOverlay');
+  if (overlay.style.display === 'flex') {
+    if (/^[0-9]$/.test(e.key)) pinPress(e.key);
+    if (e.key === 'Backspace') pinClear();
+    if (e.key === 'Escape') pinCancel();
+  }
+});
+
+document.getElementById('shiftDate').valueAsDate = new Date();
+buildList();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./service-worker.js').catch(function(error) {
+      console.log('ServiceWorker registration failed:', error);
+    });
+  });
+}
+</script>
+
+</body>
+</html>
